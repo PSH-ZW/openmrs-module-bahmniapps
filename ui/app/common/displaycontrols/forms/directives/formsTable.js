@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('bahmni.common.displaycontrol.forms')
-    .directive('formsTable', ['conceptSetService', 'spinner', '$q', 'visitFormService', 'appService', '$state', '$rootScope',
-        function (conceptSetService, spinner, $q, visitFormService, appService, $state, $rootScope) {
+    .directive('formsTable', ['conceptSetService', 'spinner', '$q', 'visitFormService', 'appService', '$state', '$rootScope', 'retrospectiveEntryService',
+        function (conceptSetService, spinner, $q, visitFormService, appService, $state, $rootScope, retrospectiveEntryService) {
             var defaultController = function ($scope) {
                 $scope.shouldPromptBrowserReload = true;
                 $scope.showFormsDate = appService.getAppDescriptor().getConfigValue("showFormsDate");
@@ -58,6 +58,26 @@ angular.module('bahmni.common.displaycontrol.forms')
                         }
                     } else { return true; }
                 };
+                $scope.retrospectiveDateCheck = function (data) {
+                    var hasPrivilege = _.some($rootScope.currentUser.privileges, {name: 'allowDashboardFormsEdit'});
+                    if (hasPrivilege) {
+                        return true;
+                    }
+                    var formDate = new Date(data.obsDatetime || data.encounterDateTime);
+                    var dashboardFormsEditDateThreshold = appService.getAppDescriptor().getConfigValue('dashboardFormsEditDateThreshold');
+                    var currentDate = new Date();
+                    var thresholdDate = new Date(new Date().setDate(dashboardFormsEditDateThreshold));
+
+                    var startDate = new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1, 0);
+                    if (currentDate > thresholdDate) {
+                        startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1, 0);
+                    }
+
+                    if (formDate > startDate) {
+                        return true;
+                    }
+                    return false;
+                };
                 var init = function () {
                     $scope.formsNotFound = false;
                     return $q.all([getAllObservationTemplates(), obsFormData()]).then(function (results) {
@@ -83,7 +103,7 @@ angular.module('bahmni.common.displaycontrol.forms')
                     return displayName;
                 };
                 var getLocaleSpecificConceptName = function (concept, locale, conceptNameType) {
-                    conceptNameType = conceptNameType ? conceptNameType : "SHORT";
+                    conceptNameType = conceptNameType || "SHORT";
                     var localeSpecificName = _.filter(concept.names, function (name) {
                         return ((name.locale === locale) && (name.conceptNameType === conceptNameType));
                     });
