@@ -81,8 +81,8 @@ angular.module('bahmni.clinical')
             };
             var retrospectiveDateCheck = function () {
                 var hasPrivilege = _.some($rootScope.currentUser.privileges, {name: 'bypassRetrospectiveDateThreshold'});
-                if (!hasPrivilege) {
-                    var retrospectiveDateThreshold = appService.getAppDescriptor().getConfigValue('retrospectiveDateThreshold');
+                var retrospectiveDateThreshold = appService.getAppDescriptor().getConfigValue('retrospectiveDateThreshold');
+                if (!hasPrivilege && retrospectiveDateThreshold) {
                     var thresholdDate = new Date(new Date().setDate(retrospectiveDateThreshold));
                     var currentDate = new Date();
 
