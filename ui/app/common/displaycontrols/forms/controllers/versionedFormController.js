@@ -124,7 +124,7 @@ angular.module('bahmni.common.displaycontrol.forms')
                     startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1, 0);
                 }
 
-                if (formDate > startDate) {
+                if (formDate >= startDate) {
                     return true;
                 }
                 return false;
