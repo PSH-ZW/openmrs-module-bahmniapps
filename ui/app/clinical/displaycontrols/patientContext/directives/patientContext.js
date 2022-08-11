@@ -30,6 +30,12 @@ angular.module('bahmni.clinical')
                     $scope.patientContext.image = Bahmni.Common.Constants.patientImageUrlByPatientUuid + $scope.patientContext.uuid;
                 }
                 $scope.patientContext.gender = $rootScope.genderMap[$scope.patientContext.gender];
+                var apLen = $scope.patientContext.additionalPatientIdentifiers ? Object.keys($scope.patientContext.additionalPatientIdentifiers).length : 0;
+                var paLen = $scope.patientContext.personAttributes ? Object.keys($scope.patientContext.personAttributes).length : 0;
+                var prALen = $scope.patientContext.programAttributes ? Object.keys($scope.patientContext.programAttributes).length : 0;
+                if ((apLen + paLen + prALen) > 3) {
+                    document.getElementsByClassName('opd-wrapper')[0].style.paddingTop = '90px';
+                }
             });
         };
 
